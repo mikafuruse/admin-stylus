@@ -6,7 +6,7 @@
 @author         mikafuruse
 ==/UserStyle== */
 
-@-moz-document url-prefix("https://app.stg-taimee.com/admin/"), url-prefix("https://app.taimee.co.jp/admin/") {
+@-moz-document url-prefix("https://app.stg-taimee.com/admin/"), url-prefix("https://app.stable.stg-taimee.com/admin/"), url-prefix("https://app.taimee.co.jp/admin/") {
 
 /* ==========================================================================
    1. Design Tokens (as CSS Custom Properties)
