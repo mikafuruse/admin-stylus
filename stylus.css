@@ -1,0 +1,735 @@
+/*
+ * Timee Admin UI Improvement Prototype (for Stylus)
+ *
+ * Version: 3.0 (Optimized for Active Admin Porting)
+ * Author: Inouemika & AI Assistant
+ *
+ * ==========================================================================
+ * IMPORTANT FOR FUTURE PORTING:
+ * This code is written with future migration to Active Admin's
+ * `active_admin.scss` in mind.
+ *
+ * Conventions:
+ * 1. CSS Custom Properties (`--var`): These are used for easy theme management.
+ *    When porting to SCSS, these should be converted to SCSS variables (`$var`).
+ * 2. `!important`: Used only where necessary to override Active Admin's
+ *    highly specific default styles from an external stylesheet. These
+ *    can likely be removed once the code is moved into the official
+ *    `active_admin.scss` file due to the natural CSS cascade order.
+ * ==========================================================================
+ */
+
+/* ==========================================================================
+   1. Design Tokens (as CSS Custom Properties)
+   ========================================================================== */
+/*
+ * In `active_admin.scss`, these would become SCSS variables.
+ * e.g., `--color-text-primary` -> `$color-text-primary: #242424;`
+ */
+:root {
+    /* Color Palette */
+    --color-text-primary: #242424;
+    --color-text-inverse: #ffffff;
+    --color-surface-primary: #ffffff;
+    --color-surface-secondary: #fafafa;
+    --color-surface-secondary-hard: #f5f5f5;
+    --color-surface-secondary-harder: #ececec; /* New token for segmented control BG */
+    --color-surface-quaternary: #242424; /* Dark BG */
+    --color-border-primary: #ececec;
+    --color-border-primary-hard: #c7c7c7; /* Added missing variable */
+    --color-border-inverse: #484848; /* Dark BG border */
+    --color-surface-overlay-dark: #484848; /* For dropdowns on dark BG */
+    --color-surface-overlay-dark-hover: #6d6d6d; /* Hover for dropdown items */
+    --color-link-primary: #006fe8;
+    --color-link-primary-hover: #0050a7;
+
+    /* Typography */
+    --font-family-base: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Helvetica Neue", Arial, Meiryo, sans-serif;
+
+    /* Spacing & Radius */
+    --spacing-xs: 4px;
+    --spacing-s: 8px;
+    --spacing-m: 12px;
+    --spacing-l: 16px;
+    --spacing-xl: 24px;
+    --border-radius-medium: 8px;
+    
+    /* Shadow */
+    --shadow-small: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+
+/* ==========================================================================
+   2. Global Resets & Base Styles
+   ========================================================================== */
+body {
+    font-family: var(--font-family-base) !important;
+    font-size: 75% !important; /* Reverted to percentage-based font size as requested */
+    background-color: var(--color-surface-secondary-hard) !important;
+    color: var(--color-text-primary) !important;
+}
+
+/* Universal text-shadow reset */
+* {
+    text-shadow: none !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-primary) !important; /* Unify heading colors */
+}
+
+h1 {
+    font-size: var(--spacing-xl) !important;
+    font-weight: 600 !important;
+    margin: 0 !important; /* Reset h1 margins as requested */
+}
+
+/* Global link styles */
+a, a:link, a:visited {
+    color: var(--color-link-primary);
+}
+a:hover {
+    color: var(--color-link-primary-hover) !important;
+}
+
+/* ==========================================================================
+   3. Active Admin Component Overrides
+   ========================================================================== */
+
+/* 3.1 Header (#header)
+-------------------------------------------------------------------------- */
+#header {
+    background: var(--color-surface-quaternary) !important;
+    border-bottom: 1px solid var(--color-border-inverse) !important;
+    box-shadow: none !important;
+    padding: 8px 24px !important; /* Vertical and horizontal padding */
+}
+
+/* 3.1.1 Brand Logo & Title (#site_title) */
+#site_title {
+    /* Fine-tuned padding for alignment and logo space */
+    padding: 4px 24px 4px 48px !important;
+    
+    /* Place logo as a background image */
+    background-image: url('https://avatars.githubusercontent.com/Taimee') !important;
+    background-size: 40px 40px !important;
+    background-repeat: no-repeat !important;
+    background-position: left center !important;
+
+    /* Hide original text to replace with pseudo-element */
+    font-size: 0 !important;
+    
+    /* Vertically align the new text */
+    height: 48px !important; /* Adjusted height */
+    display: flex !important;
+    align-items: center !important;
+    margin: 0 !important; /* Remove default Active Admin margin */
+}
+
+#site_title::after {
+    content: 'Admin'; /* Updated text (single line) */
+    
+    /* Make the new text visible and style it */
+    font-size: 18px; /* Increased font size */
+    line-height: 1.2;
+    font-weight: 600;
+    color: var(--color-text-inverse);
+}
+
+/* 3.1.2 Header Navigation Links */
+#header a, #header a:link {
+    color: var(--color-text-inverse) !important;
+}
+
+#header ul.tabs > li > a:hover {
+    background-color: var(--color-border-inverse) !important;
+}
+
+/* Style for the parent tab when its dropdown is open */
+#header ul.tabs > li:hover > a {
+    background: var(--color-border-inverse) !important;
+    border-radius: var(--spacing-xs) !important;
+}
+
+/* Style for the currently selected navigation tab (using exact selector) */
+#header ul.tabs > li.current > a,
+#header ul.tabs > li.current > a:hover,
+#header ul.tabs > li.current > a:focus {
+    background: var(--color-border-inverse) !important;
+    border-radius: var(--spacing-xs) !important;
+}
+
+/* 3.1.3 Utility Navigation (#utility_nav) */
+#utility_nav {
+    padding-right: 0 !important; /* Remove default padding */
+    display: flex !important; /* Use flexbox for alignment */
+}
+
+/* 3.2 Main Content Tables
+-------------------------------------------------------------------------- */
+
+/* Use a pseudo-element as a "backplate" with border/radius, which doesn't conflict with sticky header */
+table.index_table {
+    position: relative; /* Required for pseudo-element positioning */
+    border-collapse: separate; /* Required for border-radius to work on tables */
+    border-spacing: 0;
+    border-left: 1px solid var(--color-border-primary);
+    border-right: 1px solid var(--color-border-primary);
+    margin-top: 5px;
+}
+
+/* Give the problematic "login" column a minimum width */
+table.index_table td.col- {
+    min-width: 120px;
+}
+
+table.index_table::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1; /* Position the backplate behind the table content */
+    background-color: var(--color-surface-primary);
+    /* border: 1px solid var(--color-border-primary) !important; */ /* Removed as per user request */
+    border-radius: var(--border-radius-medium);
+    pointer-events: none; /* Allows clicking through to the table */
+}
+
+
+/* Override padding for all table cells using the exact selector */
+table.index_table td {
+    padding: 8px 10px !important;
+}
+
+/* Modernize table header styles (using exact selector) */
+table.index_table th {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    
+    /* Make header sticky */
+    position: sticky !important;
+    top: 0 !important; /* Stick to the top of the viewport */
+    z-index: 10; /* Ensure it's above table content */
+
+    /* Apply design tokens */
+    background-color: var(--color-surface-primary) !important; /* Set to white as requested */
+    border-bottom: 2px solid var(--color-border-primary) !important;
+    color: var(--color-text-primary) !important;
+    
+    /* Typography and layout */
+    font-weight: 600 !important;
+    padding: 8px 10px !important; /* Align horizontal padding with table cells */
+    text-align: left !important;
+}
+
+.table > tbody > tr > td {
+    border-top: 1px solid var(--color-border-primary) !important;
+    color: var(--color-text-primary) !important;
+}
+
+.table > tbody > tr > td a {
+    color: var(--color-link-primary) !important;
+    font-weight: 500 !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--color-surface-secondary) !important;
+}
+
+/* Override link color specifically within table headers (using exact selector) */
+table.index_table th a,
+table.index_table th a:link,
+table.index_table th a:visited {
+    color: var(--color-text-secondary) !important;
+}
+
+/* 3.3 Dropdown Menus (Layered dark theme)
+-------------------------------------------------------------------------- */
+/* Use the exact selector identified to ensure styles are applied */
+#header ul.tabs > li ul {
+    min-width: 240px !important; /* Widen menu to prevent text wrapping */
+    padding: 0 !important; /* Remove default padding causing the gray bar */
+    background-color: var(--color-surface-overlay-dark) !important;
+    border: 1px solid var(--color-surface-overlay-dark-hover) !important; /* Use hover color for a subtle border */
+    box-shadow: var(--shadow-small) !important;
+    border-radius: var(--border-radius-medium) !important;
+}
+
+#header ul.tabs > li ul > li > a {
+    color: var(--color-text-inverse) !important;
+    transition: background-color 0.2s ease;
+}
+
+#header ul.tabs > li ul > li > a:hover {
+    background-color: var(--color-surface-overlay-dark-hover) !important;
+}
+
+/* ==========================================================================
+   3.7 Sidebar
+   ========================================================================== */
+.sidebar_section,
+.panel {
+    /* Remove outdated styles */
+    background-image: none !important;
+    box-shadow: none !important;
+
+    /* Apply design tokens */
+    background-color: var(--color-surface-primary) !important; /* White background */
+    border: 1px solid var(--color-border-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+}
+
+.sidebar_section > h3 {
+    /* Remove outdated styles */
+    background-image: none !important;
+    background-color: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    /* Apply design tokens and adjustments */
+    color: var(--color-text-primary) !important;
+    font-size: 16px !important; /* Slightly larger font size */
+    font-weight: 600 !important;
+    padding: var(--spacing-l) !important; /* 16px padding on all sides */
+    margin: 0 !important;
+}
+
+/* 3.4 Title Bar (#title_bar)
+-------------------------------------------------------------------------- */
+#title_bar {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    /* Apply design tokens */
+    background-color: var(--color-surface-secondary-hard) !important; /* Match the body background */
+    color: var(--color-text-primary) !important;
+    
+    /* Adjust layout and typography */
+    padding: var(--spacing-l) 30px !important; /* Use token for vertical padding */
+    /* margin: 0 !important; */ /* Removed to allow JS to set margin-top */
+}
+
+/* ==========================================================================
+   3.5 Buttons
+   ========================================================================== */
+
+/* 3.5.1 Secondary Button (used in title_bar, forms, and general actions) */
+#title_bar .action_items span.action_item > a,
+form fieldset.actions li.cancel a,
+a.button {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    
+    /* Apply design tokens for a secondary button */
+    background-color: var(--color-surface-primary) !important; /* White background */
+    border: 1px solid var(--color-link-primary) !important;
+    color: var(--color-link-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important; /* Adjusted font size */
+    
+    /* Adjust padding for better appearance */
+    padding: 10px 14px !important;
+    
+    /* Add transition for smooth hover effect */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#title_bar .action_items span.action_item > a:hover,
+form fieldset.actions li.cancel a:hover,
+a.button:hover {
+    background-color: var(--color-link-primary) !important;
+    color: var(--color-text-inverse) !important;
+}
+
+/* 3.5.2 Primary Button (used in forms) */
+form input[type="submit"],
+form input[type="button"],
+form button {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    
+    /* Apply design tokens for a primary button */
+    background-color: var(--color-link-primary) !important;
+    color: var(--color-text-inverse) !important;
+    border-radius: var(--border-radius-medium) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    
+    /* Adjust padding for better appearance */
+    padding: 10px 14px !important;
+    
+    /* Add transition for smooth hover effect */
+    transition: background-color 0.2s ease;
+}
+
+form input[type="submit"]:hover,
+form input[type="button"]:hover,
+form button:hover {
+    background-color: var(--color-link-primary-hover) !important;
+}
+
+/* 3.5.3 Quaternary Button (Gray button, e.g., "Clear Filters", "Copy") */
+form.filter_form a.clear_filters_btn,
+.attributes_table.user tr.row-id td button.btn-copyable {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    
+    /* Apply design tokens for a quaternary button */
+    background-color: transparent !important;
+    border: 1px solid var(--color-border-primary-hard) !important;
+    color: var(--color-text-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    
+    /* Adjust padding to align with primary button */
+    padding: 10px 14px !important;
+    
+    /* Add transition for smooth hover effect */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+form.filter_form a.clear_filters_btn:hover,
+.attributes_table.user tr.row-id td button.btn-copyable:hover {
+    background-color: var(--color-surface-secondary-hard) !important;
+    border-color: var(--color-border-primary-hard) !important;
+}
+
+/* ==========================================================================
+   3.6 Forms
+   ========================================================================== */
+
+/* 3.6.1 Select elements */
+form select {
+    /* height: 30px !important; */ /* Replaced with padding/line-height */
+    padding: 6px 4px !important; /* Adjusted padding for vertical alignment */
+    line-height: 1.5 !important; /* Match typical input line-height */
+    border: 1px solid var(--color-border-primary-hard) !important;
+    border-radius: var(--spacing-xs) !important;
+    background-color: var(--color-surface-primary) !important;
+}
+
+/* 3.6.2 Focus styles for inputs and selects */
+form input:focus,
+form textarea:focus,
+form select:focus {
+    border-color: var(--color-link-primary) !important;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2) !important; /* Blue glow effect */
+    outline: none !important; /* Remove default browser outline */
+}
+
+/* 3.6.4 Form Label Width */
+form fieldset ol > li label {
+    width: 150px;
+}
+
+/* Align checkbox/radio button labels correctly */
+form fieldset > ol > li.boolean label {
+    padding-left: 150px !important;
+}
+
+/* 3.6.6 Input container alignment */
+form fieldset > ol > li fieldset:not(.inputs) ol {
+    padding-left: 150px !important;
+}
+
+/* 3.6.3 Form field spacing */
+form.filter_form .filter_form_field {
+    margin-bottom: var(--spacing-s) !important; /* Adjust vertical spacing */
+}
+
+/* Search input field adjustment */
+form.filter_form .filter_form_field.select_and_search input[type=text] {
+    margin-left: 8px;
+    width: 122px;
+}
+
+/* 3.6.5 Inline hints alignment */
+form fieldset ol > li p.inline-hints {
+    margin-left: 150px !important; /* Align with the fixed-width labels */
+}
+
+/* 3.6.3 Fieldset styles */
+form fieldset.inputs {
+    /* Remove outdated styles */
+    background-image: none !important;
+    box-shadow: none !important;
+
+    /* Apply design tokens */
+    background-color: var(--color-surface-primary) !important; /* White background */
+    border: 1px solid var(--color-border-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+    /* padding is removed from here and applied to the inner list */
+}
+
+/* Apply padding to the list inside the fieldset */
+form fieldset.inputs > ol {
+    padding: var(--spacing-l) !important;
+}
+
+/* ==========================================================================
+   3.8 Segmented Control
+   ========================================================================== */
+.table_tools_segmented_control {
+    /* Container styles */
+    border: 1px solid var(--color-border-primary-hard) !important;
+    border-radius: var(--border-radius-medium) !important;
+    display: inline-flex !important;
+    overflow: hidden;
+    box-shadow: none !important;
+    background-image: none !important;
+    background-color: var(--color-surface-secondary-hard) !important; /* Lighten background for better balance with borders */
+}
+
+.table_tools_segmented_control li {
+    margin: 0 !important;
+}
+
+.table_tools_segmented_control li + li {
+    border-left: 1px solid var(--color-border-primary-hard) !important;
+}
+
+.table_tools_segmented_control li a {
+    /* Item styles */
+    padding: 10px 16px !important; /* Slightly more vertical padding */
+    border: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    background-color: transparent !important;
+    color: var(--color-text-primary) !important;
+    font-size: 13px !important; /* Slightly smaller font size */
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+}
+
+.table_tools_segmented_control li:first-child a {
+    margin-left: 0 !important; /* Override .scopes li:first-child a style */
+}
+
+.table_tools_segmented_control li.selected {
+    /* Selected item styles */
+    background-color: var(--color-surface-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+    box-shadow: var(--shadow-small) !important;
+}
+
+.table_tools_segmented_control li.selected a {
+    /* Make selected item's text bold to stand out */
+    font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   3.9 Pagination
+   ========================================================================== */
+/* Use flexbox on the main footer container for alignment */
+#index_footer {
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+}
+
+.pagination_information {
+    margin-bottom: 0 !important; /* Reset default margin */
+}
+
+.pagination {
+    /* Remove outdated container styles */
+    border: none !important;
+    box-shadow: none !important;
+    background: none !important;
+}
+
+.pagination span.page a,
+.pagination span.next a,
+.pagination span.last a,
+.pagination span.first a,
+.pagination span.prev a,
+.pagination span.page.current {
+    /* Remove outdated item styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: 1px solid var(--color-border-primary-hard) !important;
+    border-radius: var(--spacing-xs) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: 6px 12px !important;
+    margin: 0 2px !important;
+}
+
+.pagination span.page a,
+.pagination span.next a,
+.pagination span.last a,
+.pagination span.first a,
+.pagination span.prev a {
+    background-color: var(--color-surface-primary) !important;
+    color: var(--color-link-primary) !important;
+    transition: background-color 0.2s ease;
+}
+
+.pagination span.page a:hover,
+.pagination span.next a:hover,
+.pagination span.last a:hover,
+.pagination span.first a:hover,
+.pagination span.prev a:hover {
+    background-color: var(--color-surface-secondary-hard) !important;
+}
+
+.pagination span.page.current {
+    background-color: var(--color-link-primary) !important;
+    color: var(--color-text-inverse) !important;
+    border-color: var(--color-link-primary) !important;
+}
+
+/* ==========================================================================
+   3.10 Main Content Headings
+   ========================================================================== */
+/* Style for the legend (title) of a fieldset */
+form fieldset legend {
+    background-color: var(--color-surface-primary) !important;
+    border: 1px solid var(--color-border-primary) !important;
+    border-bottom: none !important; /* Remove bottom border to merge with the fieldset */
+    border-top-left-radius: var(--border-radius-medium) !important;
+    border-top-right-radius: var(--border-radius-medium) !important;
+    padding: 0 !important; /* Padding will be on the inner span */
+}
+
+.section > h3,
+.panel > h3,
+form fieldset legend span {
+    /* Remove outdated styles */
+    background-image: none !important;
+    background-color: transparent !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    
+    /* Apply design tokens and adjustments */
+    color: var(--color-text-primary) !important;
+    font-size: 20px !important; /* Adjust size for emphasis */
+    font-weight: 700 !important;
+    padding: var(--spacing-l) !important; /* Reset to simple, self-contained padding */
+    margin: 0 !important;
+
+    /* Use flexbox for alignment with the decorative bar */
+    display: flex !important;
+    align-items: center !important;
+}
+
+h3::before,
+form fieldset legend span::before {
+    content: "";
+    display: block;
+    width: 8px;
+    height: 24px;
+    background-color: #ffd802;
+    margin-right: 8px;
+}
+
+/* ==========================================================================
+   3.11 Attribute Tables
+   ========================================================================== */
+/* Remove zebra-striping from attribute tables for consistency */
+.panel_contents table tr.odd td {
+    background: transparent !important;
+}
+
+/* ==========================================================================
+   3.12 Status Tags
+   ========================================================================== */
+.status_tag {
+    /* Remove outdated styles */
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    
+    /* Apply design tokens */
+    background-color: var(--color-surface-secondary-harder) !important;
+    color: var(--color-text-primary) !important;
+    border-radius: var(--spacing-xs) !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    padding: 3px 6px !important;
+}
+
+/* Style for "yes" (positive) status */
+.status_tag.yes {
+    background-color: var(--color-link-primary) !important; /* "Information" blue */
+    color: var(--color-text-inverse) !important; /* White text */
+}
+
+/* Style for "no" (negative/inactive) status */
+.status_tag.no {
+    background-color: #6d6d6d !important; /* Lighter dark neutral gray */
+    color: var(--color-text-inverse) !important; /* White text */
+}
+
+/* --- Status-specific colors (as specified) --- */
+
+/* Information */
+.status_tag.審査中 {
+    background-color: #006fe8 !important; /* "information".normal */
+    color: var(--color-text-inverse) !important;
+}
+
+/* Warning */
+.status_tag.保留中 {
+    background-color: #ffbe00 !important; /* "warn".normal */
+    color: var(--color-text-primary) !important;
+}
+
+/* Success */
+.status_tag.承認済み,
+.status_tag.条件付き承認済み {
+    background-color: #1bb22a !important; /* "success".normal */
+    color: var(--color-text-inverse) !important;
+}
+
+/* Alert */
+.status_tag.否認済み,
+.status_tag.アカウント制限済み {
+    background-color: #e02217 !important; /* "alert".normal */
+    color: var(--color-text-inverse) !important;
+}
+
+
+
+/* ==========================================================================
+   3.13 Flash Messages
+   ========================================================================== */
+.flash {
+    /* Remove outdated styles */
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: var(--shadow-small) !important;
+    border: 1px solid var(--color-border-primary) !important;
+    border-radius: var(--border-radius-medium) !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    padding: var(--spacing-m) var(--spacing-l) !important;
+    margin: var(--spacing-l) 0 !important;
+}
+
+/* Success/Notice message */
+.flash_notice {
+    background-color: #f0fef1 !important; /* status.success.softest */
+    color: #03660d !important; /* status.success.harder */
+    border-color: #c3fbc8 !important; /* status.success.softer */
+}
